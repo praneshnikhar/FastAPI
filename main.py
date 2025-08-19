@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from typing import Optional
+from pydantic import BaseModel
+
 app = FastAPI()
 
 # @app.get('/blog?limit=10&published= true')
@@ -41,3 +43,15 @@ def comments(id, limit=10):
 #use- python -m uvicorn main:app --reload
 #localhost:8000/docs
 #localhost:8000/redoc
+
+
+class Blog(BaseModel):
+    title:str
+    body:str
+    published_at:Optional[bool]
+
+
+@app.post('/blog')
+def create_blog(blog :Blog):
+    
+    return {'data':f"Blog is created with title as {request.title}"}
