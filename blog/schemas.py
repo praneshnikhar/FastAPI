@@ -16,5 +16,3 @@ class User(BaseModel):
     email:str
     password:str 
     
-       
-       
