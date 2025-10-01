@@ -60,3 +60,4 @@ def show(id:int, response : Response , db:Session = Depends(get_db)):
 @app.post('/user')
 def create_user(request:schemas.User):
     return request
+
