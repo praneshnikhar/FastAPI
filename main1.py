@@ -63,6 +63,7 @@ def create_posts(post: Post):
 
 @app.get("/posts/latest")
 def get_latest_post():
+    
     post = my_posts[-1]
     return {"detail": post}
 
