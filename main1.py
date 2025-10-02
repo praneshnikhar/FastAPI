@@ -58,7 +58,9 @@ def create_posts(post: Post):
     post_dict = post.dict()
     post_dict['id'] = randrange(0, 1000000)
     my_posts.append(post_dict)
-    return {"data": post_dict}
+    return {"data": post_dict} 
+
+
 
 @app.get("/posts/latest")
 def get_latest_post():
