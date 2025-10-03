@@ -9,7 +9,11 @@ import time
 from sqlalchemy.orm import Session
 import models
 from database import engine, get_db
+from database import engine
+from models import Base
 
+
+# Base.metadata.drop_all(bind=engine)   # drops all tables
 # Create tables
 models.Base.metadata.create_all(bind=engine)
 
@@ -51,14 +55,19 @@ def test_posts(db: Session = Depends(get_db)):
 
 @app.get("/posts")
 def get_posts(db:Session = Depends(get_db)):
+    posts = db.query(models.Post).all()
     return {"data": my_posts}
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post):
-    post_dict = post.dict()
-    post_dict['id'] = randrange(0, 1000000)
-    my_posts.append(post_dict)
-    return {"data": post_dict} 
+def create_posts(post: Post, db: Session= Depends(get_db)):
+    
+    new_post = models.Post(
+        title=post.title,content =post.content,published=post.published)
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    
+    return {"data": new_post} 
 
 
 @app.get("/posts/latest")
