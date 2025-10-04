@@ -11,19 +11,13 @@ import models
 from database import engine, get_db
 from database import engine
 from models import Base
-
+import schemas
 
 # Base.metadata.drop_all(bind=engine)   # drops all tables
 # Create tables
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    rating: Optional[int] = None
 
 my_posts = [
     {"title":"title of post 1", "content":"content of post 1", "id":1},
@@ -45,21 +39,13 @@ def root():
     return {"message":"hello world"}
 
 
-
-@app.get('/sqlalchemy')
-def test_posts(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all()
-    
-    print(posts)
-    return {"data":"successful"}
-
 @app.get("/posts")
 def get_posts(db:Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     return {"data": my_posts}
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post, db: Session = Depends(get_db)):
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     
     new_post = models.Post(**post.dict(exclude={"rating"}))
     db.add(new_post)
@@ -100,7 +86,7 @@ def delete_post(id: int, db:Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post, db:Session= Depends(get_db)):
+def update_post(id: int, updated_post: schemas.PostCreate, db:Session= Depends(get_db)):
     # index = find_index_post(id)
     # if index is None:
     #     raise HTTPException(
@@ -117,7 +103,7 @@ def update_post(id: int, post: Post, db:Session= Depends(get_db)):
     if post ==None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f"post with id :{id} does not exist")
     
-    post_query.update(post.dict(), synchronize_session=False)
+    post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
     
     return {"data":post_query.first()}
