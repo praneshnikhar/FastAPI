@@ -1,20 +1,5 @@
-from pydantic import BaseModel
-
-# class Blog(BaseModel):
-#     title:str
-#     body:str
-    
-# class ShowBlog(Blog):
-#     title:str
-#     body:str
-    
-#     class Config():
-#         orm_mode = True
-        
-# class User(BaseModel):
-#     name:str
-#     email:str
-#     password:str 
+from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
 class PostBase(BaseModel):
     title: str
@@ -24,4 +9,23 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
+class Post(PostBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+        
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    
+class UserOut(BaseModel):
+    id: int
+    email: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+    
 
