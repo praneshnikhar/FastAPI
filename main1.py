@@ -74,8 +74,8 @@ def create_posts(post: Post, db: Session = Depends(get_db)):
 
 @app.get("/posts/{id}")
 def get_post(id: int, db:Session = Depends(get_db)):
-    db.query(models.Post).filter(models.Post.id == id)
-    post = find_post(id)
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+    
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -84,25 +84,40 @@ def get_post(id: int, db:Session = Depends(get_db)):
     return {"post_detail": post}
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int):
+def delete_post(id: int, db:Session = Depends(get_db)):
     index = find_index_post(id)
-    if index is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"post with id:{id} does not exist"
-        )
-    my_posts.pop(index)
+    # if index is None:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail=f"post with id:{id} does not exist"
+    #     )
+    # my_posts.pop(index)
+    post = db.query(models.Post).filter(models.Post.id == id)
+    if post.first() == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = f"post with id: {id} does not exist")
+    post.delete(synchronize_session = False)
+    db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post):
-    index = find_index_post(id)
-    if index is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"post with id:{id} does not exist"
-        )
-    post_dict = post.dict()
-    post_dict['id'] = id
-    my_posts[index] = post_dict
-    return {'data': post_dict}
+def update_post(id: int, post: Post, db:Session= Depends(get_db)):
+    # index = find_index_post(id)
+    # if index is None:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail=f"post with id:{id} does not exist"
+    #     )
+    # post_dict = post.dict()
+    # post_dict['id'] = id
+    # my_posts[index] = post_dict
+    # return {'data': post_dict}
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+    post = post_query.first()
+    
+    if post ==None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f"post with id :{id} does not exist")
+    
+    post_query.update(post.dict(), synchronize_session=False)
+    db.commit()
+    
+    return {"data":post_query.first()}
