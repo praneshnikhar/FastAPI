@@ -8,8 +8,10 @@ from database import engine, get_db
 from database import engine
 from models import Base
 import schemas
+
 router = APIRouter(
-    prefix = "/posts" #+ #/{id}
+    prefix = "/posts", #+ #/{id}.
+    tags=['Posts']
 )
 
 @router.get("/", response_model =List[schemas.Post])
