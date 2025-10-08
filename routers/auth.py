@@ -11,7 +11,7 @@ def login(user_credentials:OAuth2PasswordRequestForm= Depends(), db:Session= Dep
     #     "username": "asdf ",
     #     "password" : "alsdjf"
     # }
-    user = db.query(models.User).filter(models.User.email == user_credentials.email).first()
+    user = db.query(models.User).filter(models.User.email == user_credentials.username).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"invalid credentials")
     
