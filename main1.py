@@ -18,6 +18,7 @@ import schemas
 from utils import hash
 
 from routers import post, user, auth
+import oauth2
 
 # Base.metadata.drop_all(bind=engine)   # drops all tables
 # Create tables
