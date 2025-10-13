@@ -23,7 +23,8 @@ def create_posts(
     db: Session = Depends(get_db),
     current_user: schemas.TokenData = Depends(oauth2.get_current_user)
 ):
-    print(f"Current user ID: {current_user.email}")
+    print(current_user.id)
+    # print(f"Current user ID: {current_user.email}")
     new_post = models.Post(**post.dict())
     db.add(new_post)
     db.commit()
