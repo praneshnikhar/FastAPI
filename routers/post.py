@@ -5,13 +5,13 @@ import models
 from database import get_db
 import schemas
 import oauth2
-
+from sqlalchemy import func
 router = APIRouter(
     prefix="/posts",
     tags=['Posts']
 )
 
-@router.get("/", response_model=List[schemas.Post])
+
 def get_posts(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(oauth2.get_current_user)
@@ -32,7 +32,6 @@ def create_posts(
     db.commit()
     db.refresh(new_post)
     return new_post
-
 
 
 # @router.get("/{id}", response_model=schemas.Post)
@@ -59,7 +58,15 @@ def get_posts(
         .offset(skip)
         .all()
     )
-    return posts
+    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter= True).group_by(models.Post.id).all()
+    # for post in results:
+    #     print({
+    #         "id": post.id,
+    #         "title": post.title,
+    #         "content": post.content,
+    #         "owner_id": post.owner_id
+    #     })
+    return results
 
 
 
