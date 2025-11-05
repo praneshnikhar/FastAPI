@@ -64,6 +64,7 @@ def get_posts(
     #         "id": post.id,
     #         "title": post.title,
     #         "content": post.content,
+    
     #         "owner_id": post.owner_id
     #     })
     return results
